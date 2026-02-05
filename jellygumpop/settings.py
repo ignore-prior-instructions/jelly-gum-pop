@@ -122,6 +122,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Anthropic API key for quiz generation
+# LLM API keys for quiz generation
 import os
 ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
+OPENAI_BASE_URL = os.environ.get('OPENAI_BASE_URL', '')  # Optional custom endpoint
+
+# LLM backend: 'anthropic', 'openai', or 'auto' (auto-detect based on available keys)
+LLM_BACKEND = os.environ.get('LLM_BACKEND', 'auto')

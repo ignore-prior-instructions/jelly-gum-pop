@@ -1,7 +1,60 @@
 """LLM service for generating quizzes from prompts"""
 import json
 from django.conf import settings
-from anthropic import Anthropic
+
+
+def _extract_json(content: str) -> str:
+    """Extract JSON from response, removing markdown code blocks if present"""
+    content = content.strip()
+    if content.startswith('```'):
+        lines = content.split('\n')
+        content = '\n'.join(line for line in lines if not line.startswith('```'))
+    return content.strip()
+
+
+def _generate_with_anthropic(system_prompt: str, user_prompt: str) -> dict:
+    """Generate quiz using Anthropic Claude"""
+    from anthropic import Anthropic
+    
+    client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=2000,
+        temperature=1.0,
+        system=system_prompt,
+        messages=[{
+            "role": "user",
+            "content": user_prompt
+        }]
+    )
+    
+    content = response.content[0].text.strip()
+    return json.loads(_extract_json(content))
+
+
+def _generate_with_openai(system_prompt: str, user_prompt: str) -> dict:
+    """Generate quiz using OpenAI"""
+    from openai import OpenAI
+    
+    # Support custom base URL if provided
+    client_kwargs = {'api_key': settings.OPENAI_API_KEY}
+    if hasattr(settings, 'OPENAI_BASE_URL') and settings.OPENAI_BASE_URL:
+        client_kwargs['base_url'] = settings.OPENAI_BASE_URL
+    
+    client = OpenAI(**client_kwargs)
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        temperature=1.0,
+        max_tokens=2000,
+        response_format={"type": "json_object"}
+    )
+    
+    content = response.choices[0].message.content.strip()
+    return json.loads(_extract_json(content))
 
 
 def generate_quiz(prompt: str) -> dict:
@@ -27,8 +80,6 @@ def generate_quiz(prompt: str) -> dict:
         ]
     }
     """
-    client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-    
     system_prompt = """You are a quiz generator. Create fun, shareable quizzes from user prompts.
 
 Rules:
@@ -62,27 +113,13 @@ JSON format:
   ]
 }"""
 
-    response = client.messages.create(
-        model="claude-3-5-sonnet-20241022",
-        max_tokens=2000,
-        temperature=1.0,
-        system=system_prompt,
-        messages=[{
-            "role": "user",
-            "content": prompt
-        }]
-    )
+    # Choose backend based on which API key is available
+    backend = getattr(settings, 'LLM_BACKEND', 'auto')
     
-    # Extract JSON from response
-    content = response.content[0].text.strip()
-    
-    # Try to find JSON in the response (in case Claude adds explanation)
-    if content.startswith('```'):
-        # Remove markdown code blocks
-        lines = content.split('\n')
-        content = '\n'.join(line for line in lines if not line.startswith('```'))
-    
-    return json.loads(content)
+    if backend == 'openai' or (backend == 'auto' and hasattr(settings, 'OPENAI_API_KEY') and settings.OPENAI_API_KEY):
+        return _generate_with_openai(system_prompt, prompt)
+    else:
+        return _generate_with_anthropic(system_prompt, prompt)
 
 
 def regenerate_quiz(original_prompt: str, nudge: str, original_quiz: dict) -> dict:
@@ -90,8 +127,6 @@ def regenerate_quiz(original_prompt: str, nudge: str, original_quiz: dict) -> di
     Regenerate a quiz with a nudge.
     Editing is just 'nudge it again' with context.
     """
-    client = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-    
     system_prompt = """You are a quiz generator. Modify the existing quiz based on the user's feedback.
 
 Rules:
@@ -109,21 +144,10 @@ User feedback/nudge: {nudge}
 
 Generate an updated version of the quiz."""
 
-    response = client.messages.create(
-        model="claude-3-5-sonnet-20241022",
-        max_tokens=2000,
-        temperature=1.0,
-        system=system_prompt,
-        messages=[{
-            "role": "user",
-            "content": combined_prompt
-        }]
-    )
+    # Choose backend based on which API key is available
+    backend = getattr(settings, 'LLM_BACKEND', 'auto')
     
-    content = response.content[0].text.strip()
-    
-    if content.startswith('```'):
-        lines = content.split('\n')
-        content = '\n'.join(line for line in lines if not line.startswith('```'))
-    
-    return json.loads(content)
+    if backend == 'openai' or (backend == 'auto' and hasattr(settings, 'OPENAI_API_KEY') and settings.OPENAI_API_KEY):
+        return _generate_with_openai(system_prompt, combined_prompt)
+    else:
+        return _generate_with_anthropic(system_prompt, combined_prompt)

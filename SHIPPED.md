@@ -29,7 +29,7 @@ jellygumpop/
 │           ├── take.html  # Quiz-taking page
 │           └── result.html # Result sharing page
 ├── manage.py
-├── requirements.txt       # Django + Anthropic
+├── requirements.txt       # Django + Anthropic + OpenAI
 ├── start.sh              # Quick start script
 ├── .env.example          # API key template
 └── README.md             # Updated with instructions
@@ -38,6 +38,7 @@ jellygumpop/
 ### features shipped
 
 - ✅ single-prompt quiz generation
+- ✅ **dual LLM backend** (Anthropic Claude OR OpenAI GPT-4o - your choice!)
 - ✅ JSON-based storage (lightweight & disposable)
 - ✅ UUID-based URLs (clean & shareable)
 - ✅ quiz taking with multiple choice

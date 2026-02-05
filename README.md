@@ -54,6 +54,7 @@ this is an internet object.
 - django (kept intentionally minimal)
 - server-rendered pages
 - JSON-first quiz storage
+- LLM backends: **anthropic claude** or **openai gpt-4o** (your choice!)
 - no required auth
 - no required accounts
 - future-you *can* add those later if you really must
@@ -79,9 +80,15 @@ good news! it exists now ✨
 # install dependencies
 pip install -r requirements.txt
 
-# set up your API key
+# set up your API key (choose one or both!)
 cp .env.example .env
-# edit .env and add your ANTHROPIC_API_KEY
+# edit .env and add either:
+#   ANTHROPIC_API_KEY (for Claude)
+#   OPENAI_API_KEY (for GPT-4o)
+# or both! it'll auto-detect which one to use
+#
+# optional: use a custom OpenAI-compatible endpoint
+#   OPENAI_BASE_URL=https://your-endpoint.com/v1
 
 # run migrations
 python manage.py migrate
