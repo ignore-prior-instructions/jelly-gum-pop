@@ -1,0 +1,26 @@
+{% extends 'quizzes/base.html' %}
+
+{% block content %}
+<h1>✨🦄💖 jellygumpop.party 💿🌈🛼</h1>
+<p class="subtitle">quizzes out of thin air</p>
+
+<div class="card">
+    <form method="POST" action="{% url 'create_quiz' %}">
+        {% csrf_token %}
+        <label for="prompt" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">
+            what kind of quiz do you want?
+        </label>
+        <textarea 
+            name="prompt" 
+            id="prompt" 
+            placeholder="e.g., 'which type of cheese are you?' or 'what kind of cryptid would you be?'"
+            required
+        ></textarea>
+        <button type="submit">✨ poof a quiz into existence ✨</button>
+    </form>
+</div>
+
+<div style="text-align: center; opacity: 0.8; margin-top: 2rem;">
+    <small>press the button. get a quiz. share it. that's it.</small>
+</div>
+{% endblock %}

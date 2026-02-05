@@ -1,0 +1,50 @@
+{% extends 'quizzes/base.html' %}
+
+{% block title %}{{ result.outcome.title }} - {{ result.quiz.data.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ result.quiz.data.title }}</h1>
+<p class="subtitle">{% if result.name %}{{ result.name }}'s{% else %}your{% endif %} result</p>
+
+<div class="result-box">
+    <h2>{{ result.outcome.title }}</h2>
+    <p style="font-size: 1.1rem; line-height: 1.6;">{{ result.outcome.description }}</p>
+</div>
+
+<div class="card center">
+    <p style="margin-bottom: 1rem; font-weight: 600;">share your result:</p>
+    <div class="share-url" style="background: #f8f9fa; color: #333;">
+        {{ request.build_absolute_uri }}
+    </div>
+    <button onclick="copyURL()" style="margin-top: 1rem;">📋 copy link</button>
+</div>
+
+<div class="center" style="margin-top: 2rem;">
+    <a href="{% url 'take_quiz' result.quiz.id %}" class="button" style="background: rgba(255,255,255,0.2);">
+        take it again
+    </a>
+    <a href="{% url 'home' %}" class="button" style="background: rgba(255,255,255,0.2); margin-left: 1rem;">
+        make a new quiz
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+function copyURL() {
+    const url = "{{ request.build_absolute_uri }}";
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Link copied! ✨');
+    }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('Link copied! ✨');
+    });
+}
+</script>
+{% endblock %}
