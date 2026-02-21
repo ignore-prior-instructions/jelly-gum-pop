@@ -97,6 +97,8 @@
         }
         
         .option {
+            display: flex;
+            align-items: flex-start;
             background: #f8f9fa;
             padding: 1rem;
             margin-bottom: 0.5rem;
@@ -111,7 +113,9 @@
         }
         
         .option input[type="radio"] {
-            margin-right: 0.5rem;
+            flex-shrink: 0;
+            margin-right: 0.75rem;
+            margin-top: 3px;
         }
         
         .option.selected {

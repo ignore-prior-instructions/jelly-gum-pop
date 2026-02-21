@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-sy3tf)gdo_s+i0yj1vyt=$)&_gjtv(*pb95v1yhyw$q4c011q$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -125,3 +125,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Anthropic API key for quiz generation
 import os
 ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+
+CSRF_TRUSTED_ORIGINS = ['https://*.trycloudflare.com']

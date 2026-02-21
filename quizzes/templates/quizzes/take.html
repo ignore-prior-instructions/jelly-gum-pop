@@ -44,24 +44,6 @@
     </form>
 </div>
 
-<div class="card" style="background: rgba(255,255,255,0.8);">
-    <details>
-        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 1rem;">
-            not quite right? nudge it
-        </summary>
-        <form method="POST" action="{% url 'nudge_quiz' quiz.id %}">
-            {% csrf_token %}
-            <input 
-                type="text" 
-                name="nudge" 
-                placeholder="e.g., 'make it funnier' or 'add more food options'"
-                required
-            >
-            <button type="submit">nudge it</button>
-        </form>
-    </details>
-</div>
-
 <div class="center" style="margin-top: 1rem;">
     <small style="opacity: 0.8;">
         share this quiz: <span style="word-break: break-all;">{{ request.build_absolute_uri }}</span>

@@ -28,17 +28,24 @@ def create_quiz(request):
             data=quiz_data
         )
         
-        # Redirect to the quiz page
-        return redirect('take_quiz', quiz_id=quiz.id)
+        # Redirect creator to preview page
+        return redirect('preview_quiz', quiz_id=quiz.id)
     
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
 
 def take_quiz(request, quiz_id):
-    """Show a quiz for taking"""
+    """Show a quiz for taking (no nudge controls)"""
     quiz = get_object_or_404(Quiz, id=quiz_id)
     return render(request, 'quizzes/take.html', {'quiz': quiz})
+
+
+def preview_quiz(request, quiz_id):
+    """Creator preview — shows quiz + nudge controls + shareable link"""
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    share_url = request.build_absolute_uri(f'/quiz/{quiz.id}/')
+    return render(request, 'quizzes/preview.html', {'quiz': quiz, 'share_url': share_url})
 
 
 @require_http_methods(["POST"])
@@ -113,7 +120,7 @@ def nudge_quiz(request, quiz_id):
         quiz.data = new_data
         quiz.save()
         
-        return redirect('take_quiz', quiz_id=quiz.id)
+        return redirect('preview_quiz', quiz_id=quiz.id)
     
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)

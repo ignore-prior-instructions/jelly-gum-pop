@@ -63,7 +63,7 @@ JSON format:
 }"""
 
     response = client.messages.create(
-        model="claude-3-5-sonnet-20241022",
+        model="claude-sonnet-4-5",
         max_tokens=2000,
         temperature=1.0,
         system=system_prompt,
@@ -110,7 +110,7 @@ User feedback/nudge: {nudge}
 Generate an updated version of the quiz."""
 
     response = client.messages.create(
-        model="claude-3-5-sonnet-20241022",
+        model="claude-sonnet-4-5",
         max_tokens=2000,
         temperature=1.0,
         system=system_prompt,

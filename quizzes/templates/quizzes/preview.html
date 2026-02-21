@@ -1,0 +1,78 @@
+{% extends 'quizzes/base.html' %}
+
+{% block title %}Preview: {{ quiz.data.title }} - jellygumpop.party{% endblock %}
+
+{% block content %}
+<h1>{{ quiz.data.title }}</h1>
+{% if quiz.data.description %}
+<p class="subtitle">{{ quiz.data.description }}</p>
+{% endif %}
+
+<div class="card" style="background: rgba(255,255,255,0.9); border: 2px dashed #667eea;">
+    <p style="font-size: 0.9rem; color: #667eea; font-weight: 600; margin-bottom: 1rem;">
+        🔧 creator preview — only you see this
+    </p>
+
+    <details open>
+        <summary style="cursor: pointer; font-weight: 600; margin-bottom: 1rem;">
+            not quite right? nudge it
+        </summary>
+        <form method="POST" action="{% url 'nudge_quiz' quiz.id %}">
+            {% csrf_token %}
+            <input
+                type="text"
+                name="nudge"
+                placeholder="e.g., 'make it funnier' or 'add more food options'"
+                required
+            >
+            <button type="submit">nudge it</button>
+        </form>
+    </details>
+</div>
+
+<div class="card">
+    <form method="POST" action="{% url 'submit_quiz' quiz.id %}">
+        {% csrf_token %}
+
+        <div style="margin-bottom: 2rem;">
+            <label for="name" style="display: block; margin-bottom: 0.5rem;">
+                your name (optional, but nice for sharing):
+            </label>
+            <input type="text" name="name" id="name" placeholder="leave blank to be mysterious">
+        </div>
+
+        {% for question in quiz.data.questions %}
+        <div class="question">
+            <h3>{{ forloop.counter }}. {{ question.text }}</h3>
+            <div class="options">
+                {% for option in question.options %}
+                <label class="option">
+                    <input
+                        type="radio"
+                        name="question_{{ forloop.parentloop.counter0 }}"
+                        value="{{ forloop.counter0 }}"
+                        required
+                    >
+                    {{ option.text }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="center">
+            <button type="submit">✨ get my result ✨</button>
+        </div>
+    </form>
+</div>
+
+<div class="card" style="background: rgba(255,255,255,0.8); text-align: center;">
+    <p style="font-weight: 600; margin-bottom: 0.75rem;">share this quiz</p>
+    <p class="share-url" style="background: #f8f9fa; color: #333; padding: 0.75rem; border-radius: 8px; word-break: break-all; font-family: monospace; font-size: 0.9rem;">
+        {{ share_url }}
+    </p>
+    <button onclick="navigator.clipboard.writeText('{{ share_url }}').then(() => this.textContent = '✅ copied!').catch(() => {})" style="margin-top: 0.75rem;">
+        copy link
+    </button>
+</div>
+{% endblock %}
